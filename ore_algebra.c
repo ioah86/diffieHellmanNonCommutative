@@ -56,12 +56,24 @@ int isZero_GF(struct GFModulus inp)
   int i;
   for (i = 0; i<DEGREEEXTENSION; ++i)
   {
-    if (inp.coeffs[i] !=0)
+    if (inp.coeffs[i] %MODULUS !=0)
       return 0;
   }
   return 1;
 }//isZero_GF
 
+int isEqual_GF(struct GFModulus inp1, struct GFModulus inp2)
+{//isEqual_OrePoly
+  int i;
+  for (i=0;i<DEGREEEXTENSION; ++i)
+  {
+    if (inp1.coeffs[i] %MODULUS != inp2.coeffs[i] %MODULUS)
+    {
+      return 0;
+    }
+  }
+  return 1;
+}//isEqual_OrePoly
 
 struct GFModulus getZeroElem()
 {//getZeroElem
