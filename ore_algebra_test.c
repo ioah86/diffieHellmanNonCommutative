@@ -76,6 +76,12 @@ This includes:
    1.a Adding two zeros
    1.b Adding a zero and a non-zero.
    1.c Adding two non-zero-elements.
+2. Multiplying two elements in the GF
+   2.a Multiplying 1 to an non-zero and non-one element
+   2.b Multiplying 1 to 1
+   2.c Multiplying zero to a non-zero element
+   2.d Multiplying 0 to 0
+   2.e Multiplying different non-unit non-zero elements.
  */
 int test_GF_functionality()
 {//test_GF_functionality
@@ -106,6 +112,7 @@ int test_GF_functionality()
     free(temp);
     testSuccess = 0;
   }
+  //1.c
   struct GFModulus b;
   for (i = 0; i<DEGREEEXTENSION; ++i)
   {
@@ -118,6 +125,100 @@ int test_GF_functionality()
     printf("1.c failed. Result of adding two non-zero polynomials was wrong. Result was: %s\n", temp);
     free(temp);
     testSuccess = 0;
+  }
+  
+  //2
+  b.coeffs[0] =1;
+  for (i = 1; i<DEGREEEXTENSION; ++i)
+  {//making b the unit-element
+    b.coeffs[i] = 0;
+  }//making b the unit-element
+  
+  //random elements in the ground field
+  struct GFModulus f1,f2,f3,f4,f5;
+  f1.coeffs[0] = 1; f1.coeffs[1] = 2; f1.coeffs[2] = 1;
+  f2.coeffs[0] = 1; f2.coeffs[1] = 3; f2.coeffs[2] = 1;
+  f3.coeffs[0] = 1; f3.coeffs[1] = 3; f3.coeffs[2] = 3;
+  f4.coeffs[0] = 1; f4.coeffs[1] = 0; f4.coeffs[2] = 1;
+  f5.coeffs[0] = 0; f5.coeffs[1] = 3; f5.coeffs[2] = 4;
+  //2.a
+  k = multGF(b,f1);
+  if (!isEqual_GF(f1,k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The unit element multiplied by a^2 + 2a + 1 resulted\
+ unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //2.b
+  k = multGF(b,b);
+  if (!isEqual_GF(k,b))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The unit element multiplied by itself resulted\
+ unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+
+  //2.c
+  k = multGF (f2,z);
+  if (!isEqual_GF(z,k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The zero element multiplied by a^2 + 3a + 1 resulted\
+ unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+
+  //2.d
+  k = multGF(z,z);
+  if (!isEqual_GF(z,k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The zero element multiplied by itself resulted\
+ unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //2.e
+  //f4 * f5 = 2a^2 + 2a +1
+  k = multGF(f4,f5);
+  if (k.coeffs[0] != 1 || k.coeffs[1] != 2 || k.coeffs[2]!=2)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The f4*f5 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //f3*f2 = 4*a^2 + a
+  k = multGF(f3,f2);
+  if (k.coeffs[0] != 0 || k.coeffs[1] != 1 || k.coeffs[2]!=4)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The f3*f2 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //f1*f5 = 3*a^2 + 3*a + 2
+  k = multGF(f1,f5);
+  if (k.coeffs[0] != 2 || k.coeffs[1] != 3 || k.coeffs[2]!=3)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The f1*f5 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //f4 * f2 = 4*a^2 + a + 2
+  k = multGF(f4,f2);
+  if (k.coeffs[0] != 2 || k.coeffs[1] != 1 || k.coeffs[2]!=4)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("The f4*f2 resulted unexpectedly in: %s\n",temp);
+    free(temp);
   }
   return testSuccess;
 }//test_GF_functionality
