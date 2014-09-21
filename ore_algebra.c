@@ -35,6 +35,19 @@ struct GFModulus addGF(struct GFModulus inp1,struct GFModulus inp2)
   return result;
 }//addGF
 
+struct GFModulus minusGF(struct GFModulus inp1, struct GFModulus inp2)
+{//minusGF
+  struct GFModulus result;
+  int i;
+  for (i = 0; i<=DEGREEEXTENSION; ++i)
+  {
+    result.coeffs[i] = (inp1.coeffs[i] - inp2.coeffs[i]) % MODULUS;
+    if (result.coeffs[i]<0)
+      result.coeffs[i] += MODULUS;
+  }
+  return result;
+}//minusGF
+
 struct GFModulus multGF(struct GFModulus inp1, struct GFModulus inp2)
 {//multGF
   struct GFModulus result;
@@ -75,23 +88,40 @@ int isEqual_GF(struct GFModulus inp1, struct GFModulus inp2)
   return 1;
 }//isEqual_OrePoly
 
-struct GFModulus getZeroElem()
+struct GFModulus getZeroElemGF()
 {//getZeroElem
   struct GFModulus result;
   result.coeffs[0]=0;
-  result.coeffs[1]=0;
-  result.coeffs[2]=0;
+  int i;
+  for (i = 0; i<DEGREEEXTENSION; ++i)
+    result.coeffs[i] = 0;
   return result;
 }//getZeroElem
+
+struct GFModulus getIdentityElemGF()
+{//getIdentityElem
+  struct GFModulus result;
+  result.coeffs[0] = 1;
+  int i;
+  for (i = 1; i<DEGREEEXTENSION; ++i)
+    result.coeffs[i] = 0;
+  return result;
+}//getIdentityElem
+
+
+struct GFModulus getMinusOneElemGF()
+{//getMinusOneElemGF
+  struct GFModulus result = getIdentityElemGF();
+  result.coeffs[0] = MODULUS -1;
+  return result;
+}//getMinusOneElemGF
 
 struct GFModulus getRandomGFElem()
 {//getRandomGFElem
   struct GFModulus result;
   int i;
   for (i = 0; i<DEGREEEXTENSION; ++i)
-  {
     result.coeffs[i] = rand() % MODULUS;
-  }
   return result;
 }//getRandomGFElem
 
@@ -142,9 +172,12 @@ struct GFModulus Hom2(struct GFModulus inp)
 struct GFModulus scalarMultGF(int s, struct GFModulus inp)
 {//scalarMultGF
   struct GFModulus result;
-  result.coeffs[0] = (s*inp.coeffs[0])%MODULUS;
-  result.coeffs[1] = (s*inp.coeffs[1])%MODULUS;
-  result.coeffs[2] = (s*inp.coeffs[2])%MODULUS;
+  int scalarNormed = s %MODULUS;
+  if (scalarNormed < 0)
+    scalarNormed += MODULUS;
+  int i;
+  for (i = 0; i<DEGREEEXTENSION; ++i)
+    result.coeffs[i] = (scalarNormed*inp.coeffs[i])%MODULUS;
   return result;
 }//scalarMultGF
 
@@ -350,7 +383,7 @@ result of the addition");
   //memset(coeffs, 0,
   //(result->degD1+1)*(result->degD2+1)*sizeof(int));
   for (i = 0; i<(result->degD1+1)*(result->degD2+1);++i)
-    coeffs[i] = getZeroElem();
+    coeffs[i] = getZeroElemGF();
   result->coeffs = coeffs;
   result->ptrD1manip = inp1->ptrD1manip;
   result->ptrD2manip = inp1->ptrD2manip;
@@ -404,7 +437,7 @@ multiplication result\n");
     exit(1);
   }
   for (i = 0; i<(result->degD1+1)*(result->degD2+1); ++i)
-    result->coeffs[i] = getZeroElem();
+    result->coeffs[i] = getZeroElemGF();
   //memset(result->coeffs,0,(result->degD1+1)*(result->degD2+1)*sizeof(int));
   for (i = 0 ; i<=inp1->degD2; ++i)
   {

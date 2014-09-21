@@ -82,12 +82,21 @@ This includes:
    2.c Multiplying zero to a non-zero element
    2.d Multiplying 0 to 0
    2.e Multiplying different non-unit non-zero elements.
+3. Testing the isZero-Test
+4. Testing the isEqual-Function
+5. Minussing two elements
+   5.a Minussing the same element with oneself
+   5.b Minussing different elements
+6. Scalar-multiplying in GF
+   6.a Scalar multiplication with zero-element
+   6.b Scalar multiplication with negative element
+   6.c Scalar multiplication with positive element
  */
 int test_GF_functionality()
 {//test_GF_functionality
   int testSuccess = 1;
   char *temp;
-  struct GFModulus z = getZeroElem();
+  struct GFModulus z = getZeroElemGF();
   struct GFModulus k = addGF(z,z);
   //1.a
   if (isZero_GF(k)==0)
@@ -147,7 +156,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The unit element multiplied by a^2 + 2a + 1 resulted\
+    printf("2.a failed. The unit element multiplied by a^2 + 2a + 1 resulted\
  unexpectedly in: %s\n",temp);
     free(temp);
   }
@@ -157,7 +166,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The unit element multiplied by itself resulted\
+    printf("2.b failed The unit element multiplied by itself resulted\
  unexpectedly in: %s\n",temp);
     free(temp);
   }
@@ -168,7 +177,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The zero element multiplied by a^2 + 3a + 1 resulted\
+    printf("2.c failed. The zero element multiplied by a^2 + 3a + 1 resulted\
  unexpectedly in: %s\n",temp);
     free(temp);
   }
@@ -179,7 +188,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The zero element multiplied by itself resulted\
+    printf("2.d failed. The zero element multiplied by itself resulted\
  unexpectedly in: %s\n",temp);
     free(temp);
   }
@@ -190,7 +199,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The f4*f5 resulted unexpectedly in: %s\n",temp);
+    printf("2.e failed. The f4*f5 resulted unexpectedly in: %s\n",temp);
     free(temp);
   }
   //f3*f2 = 4*a^2 + a
@@ -199,7 +208,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The f3*f2 resulted unexpectedly in: %s\n",temp);
+    printf("2.e failed. The f3*f2 resulted unexpectedly in: %s\n",temp);
     free(temp);
   }
   //f1*f5 = 3*a^2 + 3*a + 2
@@ -208,7 +217,7 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The f1*f5 resulted unexpectedly in: %s\n",temp);
+    printf("2.e failed. The f1*f5 resulted unexpectedly in: %s\n",temp);
     free(temp);
   }
   //f4 * f2 = 4*a^2 + a + 2
@@ -217,7 +226,89 @@ int test_GF_functionality()
   {
     testSuccess = 0;
     temp = GFModulusToString(k);
-    printf("The f4*f2 resulted unexpectedly in: %s\n",temp);
+    printf("2.e failed. The f4*f2 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //3.
+  k = minusGF(f4,f4);
+  if (!isZero_GF(k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("3. failed. The operation f4-f4 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  k = getIdentityElemGF();
+  if (isZero_GF(k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("3. failed. Unexpectedly, the identity-element %s was identified to \
+be zero\n",temp);
+    free(temp);
+  }
+  //4.
+  if (!isEqual_GF(f2,f2))
+  {
+    testSuccess = 0;
+    printf("4. failed. f2 is not equal to f2 according to the isEqual function.\n");
+    free(temp);
+  }
+  if (isEqual_GF(f2,f1))
+  {
+    testSuccess = 0;
+    printf("4. failed. According to the isEqual_GF function, f2 is equal to f1.\n");
+    free(temp);
+  }
+  //5a
+  k = minusGF (f1,f1);
+  if (!isZero_GF(k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("5.a failed. The f1-f1 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //5.b
+  k = minusGF (f1,f3);
+  if (k.coeffs[0] != 0 || k.coeffs[1] != 4 || k.coeffs[2] != 3)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("5.b failed. The f1-f3 resulted unexpectedly in: %s\n",temp);
+    free(temp);
+  }
+  //6
+  //6.a
+  k = scalarMultGF(0,f1);
+  if (!isZero_GF(k))
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("6.a failed. The scalar-multiplication of f1 with zero unexpectedly \
+resulted in: %s\n",temp);
+    free(temp);
+  }
+  //6.b
+  k = scalarMultGF(-1,f1);
+  if (k.coeffs[0] != MODULUS-1 || k.coeffs[1] != MODULUS - 2 ||
+      k.coeffs[2] != MODULUS-1)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("6.b failed. The scalar-multiplication of f1 with -1 unexpectedly \
+resulted in: %s\n",temp);
+    free(temp);
+  }
+  //6.c
+  k = scalarMultGF(2,f2);
+  if (k.coeffs[0] != 2 || k.coeffs[1] != 1 ||
+      k.coeffs[2] != 2)
+  {
+    testSuccess = 0;
+    temp = GFModulusToString(k);
+    printf("6.c failed. The scalar-multiplication of f2 with 2 unexpectedly \
+resulted in: %s\n",temp);
     free(temp);
   }
   return testSuccess;
