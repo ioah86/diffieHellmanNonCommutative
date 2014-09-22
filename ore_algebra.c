@@ -24,6 +24,15 @@ struct GFModulus
   int coeffs[DEGREEEXTENSION];
 };//GFModulus
 
+char* GFModulusToString(struct GFModulus inp)
+{
+  int coeffInStringSize = MODULUS/10+1;
+  char* result = malloc(DEGREEEXTENSION*coeffInStringSize + 13);
+  sprintf(result,"(%i + %ia + %ia^2)",inp.coeffs[0],inp.coeffs[1],
+		  inp.coeffs[2]);
+  return result;
+}
+
 struct GFModulus addGF(struct GFModulus inp1,struct GFModulus inp2)
 {//addGF
   struct GFModulus result;
@@ -70,7 +79,9 @@ int isZero_GF(struct GFModulus inp)
   for (i = 0; i<DEGREEEXTENSION; ++i)
   {
     if (inp.coeffs[i] %MODULUS !=0)
+    {
       return 0;
+    }
   }
   return 1;
 }//isZero_GF
@@ -89,24 +100,24 @@ int isEqual_GF(struct GFModulus inp1, struct GFModulus inp2)
 }//isEqual_OrePoly
 
 struct GFModulus getZeroElemGF()
-{//getZeroElem
+{//getZeroElemGF
   struct GFModulus result;
   result.coeffs[0]=0;
   int i;
   for (i = 0; i<DEGREEEXTENSION; ++i)
     result.coeffs[i] = 0;
   return result;
-}//getZeroElem
+}//getZeroElemGF
 
 struct GFModulus getIdentityElemGF()
-{//getIdentityElem
+{//getIdentityElemGF
   struct GFModulus result;
   result.coeffs[0] = 1;
   int i;
   for (i = 1; i<DEGREEEXTENSION; ++i)
     result.coeffs[i] = 0;
   return result;
-}//getIdentityElem
+}//getIdentityElemGF
 
 
 struct GFModulus getMinusOneElemGF()
@@ -125,14 +136,6 @@ struct GFModulus getRandomGFElem()
   return result;
 }//getRandomGFElem
 
-char* GFModulusToString(struct GFModulus inp)
-{
-  int coeffInStringSize = MODULUS/10+1;
-  char* result = malloc(DEGREEEXTENSION*coeffInStringSize + 13);
-  sprintf(result,"(%i + %ia + %ia^2)",inp.coeffs[0],inp.coeffs[1],
-		  inp.coeffs[2]);
-  return result;
-}
 
 struct GFModulus identityMap(struct GFModulus inp)
 {//identityMap
@@ -199,43 +202,6 @@ struct OrePoly
 			  //field with d2
 };//OrePoly
 
-int isZero_OrePoly(struct OrePoly inp)
-{//isZero_OrePoly
-  int i;
-  for (i=0; i<(inp.degD1+1)*(inp.degD2+1); ++i)
-  {
-    if (isZero_GF(inp.coeffs[i]) == 0)
-    {
-      return 0;
-    }
-  }
-  return 1;
-}//isZero_OrePoly
-
-int isEqual_OrePoly(struct OrePoly inp1, struct OrePoly inp2)
-{//isEqual_OrePoly
-  if (inp1.degD1 != inp2.degD1)
-    return 0;
-  if (inp1.degD2 != inp2.degD2)
-    return 0;
-  if (inp1.ptrD1manip != inp2.ptrD1manip)
-    return 0;
-  if (inp1.ptrD2manip != inp2.ptrD2manip)
-    return 0;
-  int i; int j;
-  for (i = 0; i<(inp1.degD1+1)*(inp1.degD2+1); ++i)
-  {
-    for (j=0; j<DEGREEEXTENSION; ++j)
-    {
-      if (inp1.coeffs[i].coeffs[j] != inp2.coeffs[i].coeffs[j])
-      {
-        return 0;
-      }
-    }
-  }
-  return 1;
-}//isEqual_OrePoly
-
 char* OrePolyToString(struct OrePoly* inp)
 {//printOrePoly
   int i; int j;//iteration variables
@@ -297,6 +263,100 @@ char* OrePolyToString(struct OrePoly* inp)
   return result;
 }//printOrePoly
 
+struct OrePoly * getOrePolyViaIntegerCoefficients(int degD1, int degD2,
+						struct GFModulus
+						(*ptrD1manip)(struct GFModulus),
+						struct	GFModulus
+						(*ptrD2manip)(struct GFModulus),
+						int *coeffs)
+{//getOrePolyViaIntegerCoefficients
+  struct OrePoly *result = malloc(sizeof(struct OrePoly));
+  result->degD1 = degD1;
+  result->degD2 = degD2;
+  result->ptrD1manip = ptrD1manip;
+  result->ptrD2manip = ptrD2manip;
+  int i;
+  int j = 0;
+  int k;
+  struct GFModulus *resCoeffs = malloc(sizeof(struct GFModulus)*(degD1+1)*(degD2+1));
+  for (i = 0; i<(degD1+1)*(degD2+1)*DEGREEEXTENSION;
+       i+=DEGREEEXTENSION)
+  {
+    for (k = 0; k<DEGREEEXTENSION; ++k)
+    {
+      resCoeffs[j].coeffs[k] = coeffs[i+k] % MODULUS;
+      if (resCoeffs[j].coeffs[k] < 0)
+	resCoeffs[j].coeffs[k] += MODULUS;
+    }
+    j+=1;
+  }
+  result->coeffs = resCoeffs;
+  return result;
+}//getOrePolyViaIntegerCoefficients
+
+int isZero_OrePoly(struct OrePoly *inp)
+{//isZero_OrePoly
+  int i;
+  for (i=0; i<(inp->degD1+1)*(inp->degD2+1); ++i)
+  {
+    if (isZero_GF(inp->coeffs[i])==0)
+    {
+      return 0;
+    }
+  }
+  return 1;
+}//isZero_OrePoly
+
+int isEqual_OrePoly(struct OrePoly *inp1, struct OrePoly *inp2)
+{//isEqual_OrePoly
+  if (inp1->degD1 != inp2->degD1)
+    return 0;
+  if (inp1->degD2 != inp2->degD2)
+    return 0;
+  if (inp1->ptrD1manip != inp2->ptrD1manip)
+    return 0;
+  if (inp1->ptrD2manip != inp2->ptrD2manip)
+    return 0;
+  int i; int j;
+  for (i = 0; i<(inp1->degD1+1)*(inp1->degD2+1); ++i)
+  {
+    for (j=0; j<DEGREEEXTENSION; ++j)
+    {
+      if (inp1->coeffs[i].coeffs[j] != inp2->coeffs[i].coeffs[j])
+      {
+        return 0;
+      }
+    }
+  }
+  return 1;
+}//isEqual_OrePoly
+
+struct OrePoly *getIdentityElemOrePoly()
+{//getIdentityElemOrePoly
+  struct OrePoly *result = malloc(sizeof(struct OrePoly));
+  result->degD1 = 0;
+  result->degD2 = 0;
+  result->ptrD1manip = &Hom1;
+  result->ptrD2manip = &Hom2;
+  struct GFModulus *coeffs = malloc(sizeof(struct GFModulus));
+  coeffs[0] = getIdentityElemGF();
+  result->coeffs = coeffs;
+  return result;
+}//getIdentityElemOrePoly
+
+struct OrePoly *getZeroElemOrePoly()
+{//getZeroElemOrePoly
+  struct OrePoly *result = malloc(sizeof(struct OrePoly));
+  result->degD1 = 0;
+  result->degD2 = 0;
+  result->ptrD1manip = &Hom1;
+  result->ptrD2manip = &Hom2;
+  struct GFModulus *coeffs = malloc(sizeof(struct GFModulus));
+  coeffs[0] = getZeroElemGF();
+  result->coeffs = coeffs;
+  return result;
+}//getZeroElemOrePoly
+
 struct OrePoly* scalarMult(int s, struct OrePoly* inp)
 {//scalarMultipy
   int i;
@@ -321,7 +381,7 @@ scalarMult.\n");
     struct GFModulus zeroElem;
     zeroElem.coeffs[0]= 0;
     zeroElem.coeffs[1]= 0;
-    zeroElem.coeffs[2]= 0;
+    zeroElem.coeffs[2]= 0;//TODO make it dependend on DEGREEEXTENSION
     coeffs[0] = zeroElem;
     result->coeffs = coeffs;
     result->ptrD1manip = inp->ptrD1manip;

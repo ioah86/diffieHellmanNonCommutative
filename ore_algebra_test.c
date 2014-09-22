@@ -45,7 +45,7 @@ int test_1()
   struct OrePoly *P_f = mult(P,f);
   
   int testSuccess = 1;
-  if (isEqual_OrePoly(*f_P, *P_f)==0)
+  if (isEqual_OrePoly(f_P, P_f)==0)
   {
     printf("Debug information:\n");
     char* oToStr = OrePolyToString(P);
@@ -314,6 +314,183 @@ resulted in: %s\n",temp);
   return testSuccess;
 }//test_GF_functionality
 
+/**
+ The tests in this function cover the basic arithmetics for the
+ OrePoly structure. The tests include:
+ 1. test isZero
+   1.a isZero to a zero Ore polynomial
+   1.b isZero to a nonZero Ore polynomial
+ 2. test isEqual
+   2.a compare two equal polynomials
+   2.b compare two non-equal polynomials
+ 3. test scalar-multiplication with integer
+   3.a multiply with zero-element
+   3.b multiply with 1
+   3.c multiply with non-unit non-zero element
+ 4. test addition
+   4.a Add zero-element to itself
+   4.b Add zero-element to non-zero element
+   4.c Add two non-zero elements
+ 5. testing the multiplication TODO
+   5.a Multiply zero to a non-zero OrePoly
+   5.b Multiply zero to zero
+   5.c Multiply one to itself
+   5.d Multiply one to a non-one non-unit element
+   5.e Multiply two non-zero non-unit elements
+ */
+int test_OrePoly_Arith()
+{//test_OrePoly_Arith
+  int testSuccess = 1;
+  char *tempOutp;
+  struct OrePoly *z = getZeroElemOrePoly();
+  struct OrePoly *one = getIdentityElemOrePoly();
+  //In what follows, we will generate some random elements for
+  //testing purposes
+  //f1 =(a^2+a+3)*d1^2+(4*a^2+4)*d1*d2+(a^2+4*a)*d2^2+(3*a^2+4a+4)*d1+(a^2+3)*d2
+  int tempCoeffsf1[9*DEGREEEXTENSION] = {0,0,0, 4,4,3, 3,1,1, 3,0,1,
+					 4,0,4, 0,0,0, 0,4,1, 0,0,0,
+					 0,0,0};
+  struct OrePoly *f1 =
+    getOrePolyViaIntegerCoefficients(2,2,&Hom1,&Hom2,tempCoeffsf1);
+  // f2=(-2*a^2-2*a-2)*d1^2+(-2*a^2+a-2)*d1*d2+(-a+1)*d2^2+(2*a^2+2*a-2)*d1+(-2*a+1)*d2
+  int tempCoeffsf2[9*DEGREEEXTENSION] = {0,0,0, -2,2,2, -2,-2,-2,
+					 1,-2,0, -2,1,-2, 0,0,0, 
+					 1,-1,0, 0,0,0, 0,0,0};
+  struct OrePoly *f2 =
+    getOrePolyViaIntegerCoefficients(2,2,&Hom1,&Hom2, tempCoeffsf2);
+  // f3=(2*a^2-2*a-1)*d1^2+(a^2+2)*d2^2+(a^2+2*a)*d1+(-2*a^2-2)*d2+1
+  int tempCoeffsf3[9*DEGREEEXTENSION] = {1,0,0, 0,2,1, -1,-2,2,
+					 -2,0,-2, 0,0,0, 0,0,0, 
+					 2,0,1, 0,0,0, 0,0,0};
+  struct OrePoly *f3 =
+    getOrePolyViaIntegerCoefficients(2,2,&Hom1,&Hom2, tempCoeffsf3);
+
+ 
+  //1.a
+  if (!isZero_OrePoly(z))
+  {
+    printf("1.a failed. Zero polynomial not recognized as being\
+ zero\n");
+    testSuccess = 0;
+  }
+  //1.b
+  if (isZero_OrePoly(f1))
+  {
+    printf("1.b failed. f1 is recognized of being zero.\n");
+    testSuccess = 0;
+  }
+  //2.a
+  if (!isEqual_OrePoly(f2,f2))
+  {
+    printf("2.a failed. Two equal polynomials not recognized as\
+ such.\n");
+    testSuccess = 0;
+  }
+  //2.b
+  if (isEqual_OrePoly(f1,f2))
+  {
+    printf("2.b failed. Two non-equal polynomials recognized as\
+ equal.\n");
+    testSuccess = 0;
+  }
+  //3.a
+  struct OrePoly *k = scalarMult(0,f1);
+  if (!isZero_OrePoly(k))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("3.a failed. Scalarmultiplication with 0 did not result in\
+ zero polynomial, but in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //3.b
+  k = scalarMult(1,f2);
+  if (!isEqual_OrePoly(k,f2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("3.b failed. Scalarmultiplication with 1 did not result in\
+ the same polynomial f2, but in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //3.c
+  k = scalarMult(2,f1);
+  int i;
+  for (i = 0; i<(k->degD1+1)*(k->degD2+1); ++i)
+  {
+    if (!isEqual_GF(k->coeffs[i], scalarMultGF(2,f1->coeffs[i])))
+    {
+      testSuccess = 0;
+      tempOutp = OrePolyToString(k);
+      printf("3.c failed. Scalarmultiplication with 2 did not result in\
+ the polynomial 2*f1, but in: %s.\n", tempOutp);
+      free(tempOutp);
+      break;
+    }
+  }
+  free(k->coeffs);
+  free(k);
+
+  //4.a
+  k = add(z,z);
+  if (!isZero_OrePoly(k))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("4.a failed. Adding zero to zero results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //4.b
+  k = add(z, f3);
+  if (!isEqual_OrePoly(k, f3))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("4.b failed. Adding zero to f3 results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //4.c
+  k = add (f2,f3);
+  for (i = 0; i<(k->degD1+1)*(k->degD2+1); ++i)
+  {
+    if (!isEqual_GF(k->coeffs[i],addGF(f2->coeffs[i],f3->coeffs[i])))
+    {
+      testSuccess = 0;
+      tempOutp = OrePolyToString(k);
+      printf("4.c failed. f2+f3 results in: %s.\n", tempOutp);
+      free(tempOutp);
+      break;
+    }
+  }
+  free(k->coeffs);
+  free(k);
+  
+  //freeing memory and returning
+  free(z->coeffs);
+  free(z);
+  free(one->coeffs);
+  free(one);
+  free(f1->coeffs);
+  free(f1);
+  free(f2->coeffs);
+  free(f2);
+  free(f3->coeffs);
+  free(f3);
+  return testSuccess;
+}//test_OrePoly_Arith
+
 int main()
 {//main
 //  int i;
@@ -326,5 +503,9 @@ int main()
     printf("test_GF_functionality failed.\n");
   else
     printf("test_GF_functionality succeeded.\n");
+  if (test_OrePoly_Arith() == 0)
+    printf("test_OrePoly_Arith failed.\n");
+  else
+    printf("test_OrePoly_Arith succeeded.\n");
   return 0;
 }//main
