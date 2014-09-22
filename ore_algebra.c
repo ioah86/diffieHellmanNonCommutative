@@ -468,6 +468,66 @@ result of the addition");
   return result;
 }//add
 
+struct OrePoly* minus(struct OrePoly* inp1, struct OrePoly* inp2)
+{//minus
+  int i; int j;
+  if (inp1->ptrD1manip != inp2->ptrD1manip ||
+      inp1->ptrD2manip != inp2->ptrD2manip)
+  {//in this case, we try to minus two different operators
+    printf("Maps for the two operators we want to minus do not coincide.\n");
+    exit(1);
+  }//in this case, we try to minus two different operators
+  struct OrePoly* result = malloc(sizeof(struct OrePoly));
+  if (result==NULL)
+  {
+    printf("Could not allocate memory for the result of the \
+substraction.\n");
+    exit(1);
+  }
+  if (inp1->degD1 > inp2->degD1)
+    result->degD1 = inp1->degD1;
+  else
+    result->degD1 = inp2->degD1;
+  if (inp1->degD2 > inp2->degD2)
+    result->degD2 = inp1->degD2;
+  else
+    result->degD2 = inp2->degD2;
+  struct GFModulus* coeffs =
+    malloc((result->degD1+1)*(result->degD2+1)*sizeof(struct GFModulus));
+  if (coeffs == NULL)
+  {
+    printf("Could not allocate memory for the coefficients of the \
+result of the substraction");
+    exit(1);
+  }
+  //memset(coeffs, 0,
+  //(result->degD1+1)*(result->degD2+1)*sizeof(int));
+  for (i = 0; i<(result->degD1+1)*(result->degD2+1);++i)
+    coeffs[i] = getZeroElemGF();
+  result->coeffs = coeffs;
+  result->ptrD1manip = inp1->ptrD1manip;
+  result->ptrD2manip = inp1->ptrD2manip;
+  for (i = 0; i <= inp1->degD2 ; ++i)
+  {
+    for (j=0; j<= inp1->degD1; ++j)
+    {
+      result->coeffs[i*(result->degD1+1) + j] =
+	addGF(result->coeffs[i*(result->degD1+1) + j],
+	      inp1->coeffs[i*(inp1->degD1+1) + j]);
+    }
+  }
+  for (i = 0; i <= inp2->degD2 ; ++i)
+  {
+    for (j=0; j<= inp2->degD1; ++j)
+    {
+      result->coeffs[i*(result->degD1+1) + j] =
+	minusGF(result->coeffs[i*(result->degD1+1) + j],
+	      inp2->coeffs[i*(inp2->degD1+1) + j]);
+    }
+  }
+  return result;
+}//minus
+
 struct OrePoly* mult(struct OrePoly* inp1, struct OrePoly* inp2)
 {//mult
   int i; int j; int k; int l; int m;

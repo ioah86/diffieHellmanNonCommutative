@@ -563,6 +563,300 @@ int test_OrePoly_Arith()
   return testSuccess;
 }//test_OrePoly_Arith
 
+/**
+   This tests if the polynomials that are randomly generated
+   and which are supposed to commute are in fact commuting.
+   The following cases are covered:
+   1. Randomly generate polynomials from degree 0 - 5 and check for commutation with itself
+   2. Use the generated polynomials from 1. and create keys from those and check for commutation (degree 2-6).
+ */
+int test_SecretKey_Validity()
+{
+  int testSuccess = 1;
+  char *tempOutp;
+
+  struct OrePoly *f1 = getRandomOrePoly(0,0,&Hom1,&Hom2);
+  struct OrePoly *f2 = getRandomOrePoly(1,0,&Hom1,&Hom2);
+  struct OrePoly *f3 = getRandomOrePoly(1,1,&Hom1,&Hom2);
+  struct OrePoly *f4 = getRandomOrePoly(1,2,&Hom1,&Hom2);
+  struct OrePoly *f5 = getRandomOrePoly(2,2,&Hom1,&Hom2);
+  struct OrePoly *f6 = getRandomOrePoly(3,2,&Hom1,&Hom2);
+
+  //1.
+  struct OrePoly *k1 = mult(f1,f1);
+  struct OrePoly *k2 = minus(k1,k1);
+  if(!isZero_OrePoly(k2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k2);
+    printf("Test 1.0 failed. f1*f1 - f1*f1 is not equal to 0, but to: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+
+  k1 = mult (f2,f2);
+  k2 = minus(k1,k1);
+  if(!isZero_OrePoly(k2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k2);
+    printf("Test 1.1 failed. f2*f2 - f2*f2 is not equal to 0, but to: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+
+  k1 = mult (f3,f3);
+  k2 = minus(k1,k1);
+  if(!isZero_OrePoly(k2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k2);
+    printf("Test 1.2 failed. f3*f3 - f3*f3 is not equal to 0, but to: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+
+  k1 = mult (f4,f4);
+  k2 = minus(k1,k1);
+  if(!isZero_OrePoly(k2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k2);
+    printf("Test 1.3 failed. f4*f4 - f4*f4 is not equal to 0, but to: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+
+  k1 = mult (f5,f5);
+  k2 = minus(k1,k1);
+  if(!isZero_OrePoly(k2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k2);
+    printf("Test 1.4 failed. f5*f5 - f5*f5 is not equal to 0, but to: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+
+  k1 = mult (f6,f6);
+  k2 = minus(k1,k1);
+  if(!isZero_OrePoly(k2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k2);
+    printf("Test 1.5 failed. f6*f6 - f6*f6 is not equal to 0, but to: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+
+  //2.
+  k1 = generateRandomSecretKey(2,f1);
+  k2 = generateRandomSecretKey(3,f1);
+  struct OrePoly *k3 = mult(k1,k2);
+  struct OrePoly *k4 = mult(k2,k1);
+  struct OrePoly *k5 = minus(k3,k4);
+  if (!isZero_OrePoly(k5))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k5);
+    printf("Test 2.1 failed. Generated random secret keys did not commute. Their difference is: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k1);
+    printf("The first polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k2);
+    printf("The second polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+  free(k3->coeffs);
+  free(k3);
+  free(k4->coeffs);
+  free(k4);
+  free(k5->coeffs);
+  free(k5);
+
+  k1 = generateRandomSecretKey(5,f2);
+  k2 = generateRandomSecretKey(4,f2);
+  k3 = mult(k1,k2);
+  k4 = mult(k2,k1);
+  k5 = minus(k3,k4);
+  if (!isZero_OrePoly(k5))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k5);
+    printf("Test 2.2 failed. Generated random secret keys did not commute. Their difference is: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k1);
+    printf("The first polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k2);
+    printf("The second polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+  free(k3->coeffs);
+  free(k3);
+  free(k4->coeffs);
+  free(k4);
+  free(k5->coeffs);
+  free(k5);
+  
+  k1 = generateRandomSecretKey(3,f3);
+  k2 = generateRandomSecretKey(6,f3);
+  k3 = mult(k1,k2);
+  k4 = mult(k2,k1);
+  k5 = minus(k3,k4);
+  if (!isZero_OrePoly(k5))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k5);
+    printf("Test 2.3 failed. Generated random secret keys did not commute. Their difference is: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k1);
+    printf("The first polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k2);
+    printf("The second polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+  free(k3->coeffs);
+  free(k3);
+  free(k4->coeffs);
+  free(k4);
+  free(k5->coeffs);
+  free(k5);
+
+  k1 = generateRandomSecretKey(5,f4);
+  k2 = generateRandomSecretKey(6,f4);
+  k3 = mult(k1,k2);
+  k4 = mult(k2,k1);
+  k5 = minus(k3,k4);
+  if (!isZero_OrePoly(k5))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k5);
+    printf("Test 2.4 failed. Generated random secret keys did not commute. Their difference is: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k1);
+    printf("The first polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k2);
+    printf("The second polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+  free(k3->coeffs);
+  free(k3);
+  free(k4->coeffs);
+  free(k4);
+  free(k5->coeffs);
+  free(k5);
+
+  k1 = generateRandomSecretKey(6,f5);
+  k2 = generateRandomSecretKey(6,f5);
+  k3 = mult(k1,k2);
+  k4 = mult(k2,k1);
+  k5 = minus(k3,k4);
+  if (!isZero_OrePoly(k5))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k5);
+    printf("Test 2.5 failed. Generated random secret keys did not commute. Their difference is: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k1);
+    printf("The first polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k2);
+    printf("The second polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+  free(k3->coeffs);
+  free(k3);
+  free(k4->coeffs);
+  free(k4);
+  free(k5->coeffs);
+  free(k5);
+
+  k1 = generateRandomSecretKey(3,f6);
+  k2 = generateRandomSecretKey(3,f6);
+  k3 = mult(k1,k2);
+  k4 = mult(k2,k1);
+  k5 = minus(k3,k4);
+  if (!isZero_OrePoly(k5))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k5);
+    printf("Test 2.6 failed. Generated random secret keys did not commute. Their difference is: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k1);
+    printf("The first polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+    tempOutp = OrePolyToString(k2);
+    printf("The second polynomial was: %s\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k1->coeffs);
+  free(k1);
+  free(k2->coeffs);
+  free(k2);
+  free(k3->coeffs);
+  free(k3);
+  free(k4->coeffs);
+  free(k4);
+  free(k5->coeffs);
+  free(k5);
+
+  free(f1->coeffs);
+  free(f1);
+  free(f2->coeffs);
+  free(f2);
+  free(f3->coeffs);
+  free(f3);
+  free(f4->coeffs);
+  free(f4);
+  free(f5->coeffs);
+  free(f5);
+  free(f6->coeffs);
+  free(f6);
+  return testSuccess;
+}
+
 int main()
 {//main
 //  int i;
@@ -579,5 +873,9 @@ int main()
     printf("test_OrePoly_Arith failed.\n");
   else
     printf("test_OrePoly_Arith succeeded.\n");
+  if (test_SecretKey_Validity() == 0)
+    printf("test_SecretKey_Validity failed.\n");
+  else
+    printf("test_SecretKey_Validity succeeded.\n");
   return 0;
 }//main
