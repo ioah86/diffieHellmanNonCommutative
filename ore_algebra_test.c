@@ -331,7 +331,7 @@ resulted in: %s\n",temp);
    4.a Add zero-element to itself
    4.b Add zero-element to non-zero element
    4.c Add two non-zero elements
- 5. testing the multiplication TODO
+ 5. testing the multiplication
    5.a Multiply zero to a non-zero OrePoly
    5.b Multiply zero to zero
    5.c Multiply one to itself
@@ -346,7 +346,7 @@ int test_OrePoly_Arith()
   struct OrePoly *one = getIdentityElemOrePoly();
   //In what follows, we will generate some random elements for
   //testing purposes
-  //f1 =(a^2+a+3)*d1^2+(4*a^2+4)*d1*d2+(a^2+4*a)*d2^2+(3*a^2+4a+4)*d1+(a^2+3)*d2
+  //f1 =(a^2+a+3)*d1^2+(4*a^2+4)*d1*d2+(a^2+4*a)*d2^2+(3*a^2+4*a+4)*d1+(a^2+3)*d2
   int tempCoeffsf1[9*DEGREEEXTENSION] = {0,0,0, 4,4,3, 3,1,1, 3,0,1,
 					 4,0,4, 0,0,0, 0,4,1, 0,0,0,
 					 0,0,0};
@@ -365,7 +365,17 @@ int test_OrePoly_Arith()
   struct OrePoly *f3 =
     getOrePolyViaIntegerCoefficients(2,2,&Hom1,&Hom2, tempCoeffsf3);
 
- 
+  //f1*f2 = (2*a^2+3*a)*d1^4+(4*a^2+4*a+3)*d1^3*d2+(3*a^2+4*a)*d1^2*d2^2+(2*a^2+4*a+4)*d1*d2^3
+  //        +(4*a^2+1)*d2^4+(2*a^2+3*a+1)*d1^3+(2*a^2+2*a+3)*d1^2*d2+(4*a^2+3*a+1)*d1*d2^2
+  //        +(4*a^2+2*a)*d2^3+(4*a+1)*d1^2+(4*a^2+3)*d1*d2+(3*a^2+2*a+3)*d2^2
+  int tempCoeffsf1f2[25*DEGREEEXTENSION] = {0,0,0, 0,0,0, 1,4,0, 1,3,2, 0,3,2,
+                                            0,0,0, 3,0,4, 3,2,2, 3,4,4, 0,0,0,
+                                            3,2,3, 1,3,4, 0,4,3, 0,0,0, 0,0,0,
+                                            0,2,4, 4,4,2, 0,0,0, 0,0,0, 0,0,0,
+                                            1,0,4, 0,0,0, 0,0,0, 0,0,0, 0,0,0};
+  
+  struct OrePoly *f1f2 =
+    getOrePolyViaIntegerCoefficients(4,4,&Hom1,&Hom2, tempCoeffsf1f2);
   //1.a
   if (!isZero_OrePoly(z))
   {
@@ -477,6 +487,66 @@ int test_OrePoly_Arith()
   free(k->coeffs);
   free(k);
   
+  //5.a
+  k = mult(z,f1);
+  if(!isZero_OrePoly(k))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("5.a failed. 0*f1 results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //5.b
+  k = mult(z,z);
+  if(!isZero_OrePoly(k))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("5.a failed. 0*0 results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //5.c
+  k = mult(one,one);
+  if(!isEqual_OrePoly(k,one))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("5.c failed. 1*1 results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //5.d
+  k = mult(one,f1);
+  if(!isEqual_OrePoly(k,f1))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("5.d failed. 1*f1 results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
+  //5.e
+  k = mult(f1,f2);
+  if(!isEqual_OrePoly(k,f1f2))
+  {
+    testSuccess = 0;
+    tempOutp = OrePolyToString(k);
+    printf("5.e failed. f1*f2 results in: %s.\n", tempOutp);
+    free(tempOutp);
+  }
+  free(k->coeffs);
+  free(k);
+
   //freeing memory and returning
   free(z->coeffs);
   free(z);
@@ -488,6 +558,8 @@ int test_OrePoly_Arith()
   free(f2);
   free(f3->coeffs);
   free(f3);
+  free(f1f2->coeffs);
+  free(f1f2);
   return testSuccess;
 }//test_OrePoly_Arith
 
