@@ -157,6 +157,8 @@ struct GFModulus Hom1(struct GFModulus inp)
   return result;
 }//Hom1
 
+#define ORDERHOM1 (3)
+
 struct GFModulus Hom2(struct GFModulus inp)
 {//Hom2
   //Short description of Hom2:
@@ -171,6 +173,8 @@ struct GFModulus Hom2(struct GFModulus inp)
   result.coeffs[2] = (2*c) %MODULUS;
   return result;
 }//Hom2
+
+#define ORDERHOM2 (3)
 
 struct GFModulus scalarMultGF(int s, struct GFModulus inp)
 {//scalarMultGF
@@ -570,10 +574,20 @@ multiplication result\n");
 //	  printf("i: %i , j: %i , k: %i , l:%i\n",i,j,k,l);
 //	  printf("position: %i\n",(i+k)*(result->degD1+1) + j+l);
 	  tempCoeff = inp2->coeffs[k*(inp2->degD1+1) + l];
+#ifndef ORDERHOM2
 	  for (m = 0; m<i; ++m)
 	    tempCoeff = inp1->ptrD2manip(tempCoeff);
+#else
+          for (m = 0; m<i%ORDERHOM2; ++m)
+	    tempCoeff = inp1->ptrD2manip(tempCoeff);
+#endif
+#ifndef ORDERHOM1
 	  for (m = 0; m<j; ++m)
 	    tempCoeff = inp1->ptrD1manip(tempCoeff);
+#else
+          for (m = 0; m<j%ORDERHOM1; ++m)
+	    tempCoeff = inp1->ptrD1manip(tempCoeff);
+#endif
 //	  printf("We are adding %i * %i to that position.\n",
 //		 (inp1->coeffs[i*(inp1->degD1+1)+j]),tempCoeff );
 //	  printf("initial value at that position: %i\n",
