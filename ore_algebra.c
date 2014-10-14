@@ -11,6 +11,8 @@
 
 #define MODULUS (5)
 #define DEGREEEXTENSION (3)
+#define NUMBEROFELEMENTSINGF (125) //TODO: This can be computed as MODULUS^DEGREEEXTENSION,
+                                   //but I don't know the right tools to compute this via a makro.
 
 //////////////////////////////////////////////////
 // CAUTION: The Following functions and definitions have to be made
@@ -684,3 +686,56 @@ scalarMult.\n");
   return result;
 }//generateRandomSecretKey
 
+struct GFModulus* getAllPossibleGFElements()
+{//getAllPossibleGFElements()
+  //TODO: Make that work for arbitrary fields
+  struct GFModulus *result = malloc(NUMBEROFELEMENTSINGF*sizeof(struct GFModulus));
+  int i; int j; int k;
+  int l = 0;
+  for (i = 0; i<MODULUS; ++i)
+  {
+    for (j = 0; j<MODULUS; ++j)
+    {
+      for (k = 0; k<MODULUS; ++k)
+      {
+        result[l].coeffs[0] = i;
+        result[l].coeffs[1] = j;
+        result[l].coeffs[2] = k;
+        ++l;
+      }
+    }
+  }
+  return result;
+}//getAllPossibleGFElements
+
+/* struct OrePoly** getAllPossibleOrePolysOfDegreeN(int n) */
+/* {//getAllPossibleOrePolysOfDegreeN */
+/*   if (n <0) */
+/*     return NULL; */
+/*   int expectedSize = 1; */
+/*   int i; */
+/*   for (i = 0; i<(n+1); ++i) */
+/*     expectedSize*=NUMBEROFELEMENTSINGF; */
+/*   struct GFModulus* allPossibleGFs = getAllPossibleGFElements(); */
+/*   struct OrePoly** result = malloc(expectedSize*sizeOf(struct OrePoly*)); */
+/*   if (n == 0) */
+/*   {//termination case for the recursion */
+/*     struct GFModulus *coeffs; */
+/*     for (i = 0; i<NUMBEROFELEMENTSINGF; ++i) */
+/*     { */
+/*       result[i] = malloc(sizeof(struct OrePoly)); */
+/*       result[i]->degD1 = 0; */
+/*       result[i]->degD2 = 0; */
+/*       result[i]->ptrD1manip = &Hom1; */
+/*       result[i]->ptrD2manip = &Hom2; */
+/*       coeffs = malloc(sizeof(GFModulus)); */
+/*       coeffs[0] = allPossibleGFs[i]; */
+/*       result[i]->coeffs = coeffs;       */
+/*     } */
+/*   }//termination case for the recursion */
+/*   else */
+/*   {//Recursive call case */
+/*     struct GFModulus** resultTemp = getAllPossibleGFElements(n-1); */
+/*     //TODO */
+/*   return result; */
+/* }//getAllPossibleOrePolysOfDegreeN */

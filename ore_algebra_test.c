@@ -857,6 +857,52 @@ int test_SecretKey_Validity()
   return testSuccess;
 }
 
+/**
+   This is a testsuite to check if the elements in the Galois field are
+   correctly enumerated by the function getAllPossibleGFElements.
+   The tests cover random checks, namely:
+   1. The first element is 0
+   2. The last element is 4a^(DEGREEEXTENSION-1) + ... + 4a+ 4
+   3. The element at position 38 ist 1 + 2a + 3a^2 %TODO: Alter this test to work in a general framework
+ */
+int test_GF_Enumeration()
+{//test_GF_Enumeration
+  struct GFModulus *obj = getAllPossibleGFElements();
+  int testSuccess = 1;
+  char* tempOutp;
+  if (obj[0].coeffs[0] != 0 || obj[0].coeffs[1] != 0 || obj[0].coeffs[2] !=0)
+  {
+    tempOutp = GFModulusToString(obj[0]);
+    printf("Test 1 failed. Expected the zero-element at the 0-position, but got: %s\n", tempOutp);
+    free(tempOutp);
+    testSuccess = 0;
+  }
+  if (obj[124].coeffs[0] != 4 || obj[124].coeffs[1] != 4 || obj[124].coeffs[2] !=4)
+  {
+    tempOutp = GFModulusToString(obj[124]);
+    printf("Test 2 failed. Expected the element 4 + 4a +... at the 124-position, but got: %s\n", tempOutp);
+    free(tempOutp);
+    testSuccess = 0;
+  }
+  if (obj[38].coeffs[0] != 1 || obj[38].coeffs[1] != 2 || obj[38].coeffs[2] !=3)
+  {
+    tempOutp = GFModulusToString(obj[38]);
+    printf("Test 3 failed. Expected the element 1 + 2a +... at the 38-position, but got: %s\n", tempOutp);
+    free(tempOutp);
+    testSuccess = 0;
+  }
+
+  /* int i; */
+  /* for (i = 0; i<NUMBEROFELEMENTSINGF; ++i) */
+  /* { */
+  /*   tempOutp = GFModulusToString(obj[i]); */
+  /*   printf("%s\n", tempOutp); */
+  /*   free(tempOutp); */
+  /* } */
+  free(obj);
+  return testSuccess;
+}//test_GF_Enumeration
+
 int main()
 {//main
 //  int i;
@@ -877,5 +923,9 @@ int main()
     printf("test_SecretKey_Validity failed.\n");
   else
     printf("test_SecretKey_Validity succeeded.\n");
+  if (test_GF_Enumeration() ==0)
+    printf("test_GF_Enumeration failed.\n");
+  else
+    printf("test_GF_Enumeration succeeded.\n");
   return 0;
 }//main
