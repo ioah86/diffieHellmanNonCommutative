@@ -696,7 +696,7 @@ generateRandomSecretKey.\n");
 scalarMult.\n");
     exit(1);
   }
-  coeffs[0].coeffs[0]=1;
+  coeffs[0].coeffs[0]=(rand() % (MODULUS-1))+1;
   coeffs[0].coeffs[1]=0;
   coeffs[0].coeffs[2]=0;
   
@@ -710,10 +710,10 @@ scalarMult.\n");
   int tempCoeff;
   for (i= 1 ; i<=deg; ++i)
   {
-    tempCoeff = rand() % MODULUS;
     if (i == deg)
-      if (tempCoeff == 0)//making sure degree is correct
-	tempCoeff=1;
+      tempCoeff = (rand() % (MODULUS-1))+1;
+    else
+      tempCoeff = rand() % MODULUS;
     temp1 = scalarMult(tempCoeff,tempPPower); //c_i * P^i
     temp2 = add(result, temp1);//result + c_i*P^i
     free(temp1->coeffs);
