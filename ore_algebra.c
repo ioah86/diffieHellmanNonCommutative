@@ -35,6 +35,11 @@ char* GFModulusToString(struct GFModulus inp)
   return result;
 }
 
+void GFModulusToStdOut(struct GFModulus inp)
+{
+  printf("(%i + %ia + %ia^2)",inp.coeffs[0],inp.coeffs[1],inp.coeffs[2]);
+}
+
 struct GFModulus addGF(struct GFModulus inp1,struct GFModulus inp2)
 {//addGF
   struct GFModulus result;
@@ -209,7 +214,7 @@ struct OrePoly
 };//OrePoly
 
 char* OrePolyToString(struct OrePoly* inp)
-{//printOrePoly
+{//OrePolyToString
   int i; int j;//iteration variables
   int coeffInStringSize = DEGREEEXTENSION*(MODULUS/10+1) + 13;
   int monomialInStringSize = (inp->degD1)/10+(inp->degD2)/10 + 8;
@@ -267,7 +272,47 @@ char* OrePolyToString(struct OrePoly* inp)
     result[1] = '\0';
   }
   return result;
-}//printOrePoly
+}//OrePolyToString
+
+void OrePolyToStdOut(struct OrePoly* inp)
+{//OrePolyToStdOut
+  int i; int j;//iteration variables
+  int alreadyACoeffFound = 0;
+  for(i=0; i<=inp->degD2; ++i)
+  {//iterating through all possible degrees of D2
+    for (j = 0; j<= inp->degD1; ++j)
+    {//iterating through all possible degrees of D1
+      if (isZero_GF(inp->coeffs[i*(inp->degD1+1)+j])==0)
+      {//only then, we are printing something
+	if (alreadyACoeffFound)
+	  printf(" + ");
+	else
+	  alreadyACoeffFound = 1;
+	GFModulusToStdOut((inp->coeffs)[i*(inp->degD1+1) + j]);
+        if (i !=0 || j!=0)
+	{
+	  if (i !=0 && j!=0)
+	  {
+	    printf("d1^%id2^%i", j, i);
+	  }
+	  else if (i==0)
+	  {
+	    printf("d1^%i", j);
+	  }
+	  else
+	  {
+	    printf("d2^%i", i);
+	  }
+	}
+      }//only then, we are printing something
+    }//iterating through all possible degrees of D1
+  }//iterating through all possible degrees of D2
+  if(!alreadyACoeffFound)
+  {
+    printf("0");
+  }
+  printf("\n");
+}//OrePolyToStdOut
 
 struct OrePoly * getOrePolyViaIntegerCoefficients(int degD1, int degD2,
 						struct GFModulus
