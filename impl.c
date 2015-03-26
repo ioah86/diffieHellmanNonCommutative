@@ -8,13 +8,13 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ore_algebra.c"
+#include "ore_algebra.h"
 
 #define LDEG 25,25
 #define QDEG 3,2
 #define PDEG 2,3
-#define PPDEG 50
-#define QQDEG 50
+#define PPDEG 10
+#define QQDEG 10
 
 int main()
 {//main

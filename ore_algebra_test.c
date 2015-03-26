@@ -8,7 +8,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ore_algebra.c"
+#include "ore_algebra.h"
 
 /**
    This test covers the following scenario:
