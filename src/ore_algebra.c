@@ -416,7 +416,7 @@ multiplication result\n");
   for (i=0; i<=inp1->degD2 + inp2->degD2;++i)
     omp_init_lock(resultLocks+i);
 
-#pragma omp parallel for private(tempCoeff,m,i,j,k,l)
+#pragma omp parallel for private(tempCoeff,m,i,j,k,l) schedule(auto)
   for (tempIter = 0; tempIter<(inp1->degD1+1)*(inp1->degD2+1);++tempIter)
   {//iteration over the degrees of inp1
     /* for (i = 0 ; i<=inp1->degD2; ++i) */
@@ -427,6 +427,7 @@ multiplication result\n");
     j = tempIter%(inp1->degD1 +1);
     for (k = 0; k<=inp2->degD2; ++k)
     {//iteration over degD2 of inp2
+      omp_set_lock(resultLocks + (i+k));
       for (l = 0; l<=inp2->degD1; ++l)
       {//iteration over degD1 of inp2
         tempCoeff = inp2->coeffs[k*(inp2->degD1+1) + l];
@@ -444,12 +445,11 @@ multiplication result\n");
         for (m = 0; m<j%ORDERHOM1; ++m)
           tempCoeff = inp1->ptrD1manip(tempCoeff);
 #endif
-        omp_set_lock(resultLocks + (i+k));
         result->coeffs[(i+k)*(result->degD1+1) + j+l] =
           addGF(result->coeffs[(i+k)*(result->degD1+1) + j+l],
                 multGF((inp1->coeffs[i*(inp1->degD1+1)+j]),tempCoeff));
-        omp_unset_lock(resultLocks + (i+k));
       }//iteration over degD1 of inp2
+      omp_unset_lock(resultLocks + (i+k));
     }//iteration over degD2 of inp2
     /* }//iteration over degD1 of inp1 */
     /* }//iteration over degD2 of inp1 */
