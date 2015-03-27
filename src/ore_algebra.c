@@ -8,6 +8,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 
 #include "ore_algebra.h"
 
@@ -381,6 +382,7 @@ result of the substraction");
 struct OrePoly* mult(struct OrePoly* inp1, struct OrePoly* inp2)
 {//mult
   int i; int j; int k; int l; int m;
+  int tempIter;
   struct GFModulus tempCoeff;
   if (inp1->ptrD1manip != inp2->ptrD1manip ||
       inp1->ptrD2manip != inp2->ptrD2manip)
@@ -408,45 +410,53 @@ multiplication result\n");
   }
   for (i = 0; i<(result->degD1+1)*(result->degD2+1); ++i)
     result->coeffs[i] = getZeroElemGF();
-  //memset(result->coeffs,0,(result->degD1+1)*(result->degD2+1)*sizeof(int));
-  for (i = 0 ; i<=inp1->degD2; ++i)
-  {
-    for (j = 0 ; j<=inp1->degD1; ++j)
-    {
-      for (k = 0; k<=inp2->degD2; ++k)
-      {
-	for (l = 0; l<=inp2->degD1; ++l)
-	{
-//	  printf("i: %i , j: %i , k: %i , l:%i\n",i,j,k,l);
-//	  printf("position: %i\n",(i+k)*(result->degD1+1) + j+l);
-	  tempCoeff = inp2->coeffs[k*(inp2->degD1+1) + l];
+
+  omp_lock_t *resultLocks;
+  resultLocks = (omp_lock_t*)malloc((inp1->degD2 + inp2->degD2 + 1)*sizeof(omp_lock_t));
+  for (i=0; i<=inp1->degD2 + inp2->degD2;++i)
+    omp_init_lock(resultLocks+i);
+
+#pragma omp parallel for private(tempCoeff,m,i,j,k,l)
+  for (tempIter = 0; tempIter<(inp1->degD1+1)*(inp1->degD2+1);++tempIter)
+  {//iteration over the degrees of inp1
+    /* for (i = 0 ; i<=inp1->degD2; ++i) */
+    /* {//iteration over degD2 of inp1 */
+    /*   for (j = 0 ; j<=inp1->degD1; ++j) */
+    /*   {//iteration over degD1 of inp1 */
+    i = tempIter/(inp1->degD1 +1);
+    j = tempIter%(inp1->degD1 +1);
+    for (k = 0; k<=inp2->degD2; ++k)
+    {//iteration over degD2 of inp2
+      for (l = 0; l<=inp2->degD1; ++l)
+      {//iteration over degD1 of inp2
+        tempCoeff = inp2->coeffs[k*(inp2->degD1+1) + l];
 #ifndef ORDERHOM2
-	  for (m = 0; m<i; ++m)
-	    tempCoeff = inp1->ptrD2manip(tempCoeff);
+        for (m = 0; m<i; ++m)
+          tempCoeff = inp1->ptrD2manip(tempCoeff);
 #else
-          for (m = 0; m<i%ORDERHOM2; ++m)
-	    tempCoeff = inp1->ptrD2manip(tempCoeff);
+        for (m = 0; m<i%ORDERHOM2; ++m)
+          tempCoeff = inp1->ptrD2manip(tempCoeff);
 #endif
 #ifndef ORDERHOM1
-	  for (m = 0; m<j; ++m)
-	    tempCoeff = inp1->ptrD1manip(tempCoeff);
+        for (m = 0; m<j; ++m)
+          tempCoeff = inp1->ptrD1manip(tempCoeff);
 #else
-          for (m = 0; m<j%ORDERHOM1; ++m)
-	    tempCoeff = inp1->ptrD1manip(tempCoeff);
+        for (m = 0; m<j%ORDERHOM1; ++m)
+          tempCoeff = inp1->ptrD1manip(tempCoeff);
 #endif
-//	  printf("We are adding %i * %i to that position.\n",
-//		 (inp1->coeffs[i*(inp1->degD1+1)+j]),tempCoeff );
-//	  printf("initial value at that position: %i\n",
-//		 result->coeffs[(i+k)*(result->degD1+1) + j+l]);
-	  result->coeffs[(i+k)*(result->degD1+1) + j+l] =
-	    addGF(result->coeffs[(i+k)*(result->degD1+1) + j+l],
-		  multGF((inp1->coeffs[i*(inp1->degD1+1)+j]),tempCoeff));
-//	  printf("Value afterwards: %i\n",
-//		 result->coeffs[(i+k)*(result->degD1+1) + j+l]);
-	}
-      }
-    }
-  }
+        omp_set_lock(resultLocks + (i+k));
+        result->coeffs[(i+k)*(result->degD1+1) + j+l] =
+          addGF(result->coeffs[(i+k)*(result->degD1+1) + j+l],
+                multGF((inp1->coeffs[i*(inp1->degD1+1)+j]),tempCoeff));
+        omp_unset_lock(resultLocks + (i+k));
+      }//iteration over degD1 of inp2
+    }//iteration over degD2 of inp2
+    /* }//iteration over degD1 of inp1 */
+    /* }//iteration over degD2 of inp1 */
+  }//iteration over the degrees of inp1
+  for (i=0; i<=inp1->degD2 + inp2->degD2;++i)
+    omp_destroy_lock(resultLocks+i);
+  free(resultLocks);
   return result;
 }//mult
 

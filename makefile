@@ -8,23 +8,31 @@ CFLAGS=-Wall
 CPFLAGS=-Wall -fopenmp
 COPFLAGS=-Wall -fopenmp -c
 COFLAGS=-Wall -c
+SRCFLDR=src
+BLDFLDR=build
+LIBFLDR=lib
+TSTSFLDR=tests
 
-all: impl tests
+all: buildfolder libfolder impl tests
 
-tests: ore_algebra.o gf_coefficients.o
-	$(CC) $(CFLAGS) ore_algebra_test.c -o tests ore_algebra.o gf_coefficients.o
+buildfolder:
+	mkdir -p $(BLDFLDR)
 
-impl: ore_algebra.o gf_coefficients.o
-	$(CC) $(CFLAGS) impl.c -o impl ore_algebra.o gf_coefficients.o
+libfolder:
+	mkdir -p $(LIBFLDR)
 
-ore_algebra.o:
-	$(CC) $(COFLAGS) ore_algebra.c -o ore_algebra.o
+tests: ore_algebra gf_coefficients $(TSTSFLDR)/ore_algebra_test.c
+	$(CC) $(CPFLAGS) $(TSTSFLDR)/ore_algebra_test.c -o $(BLDFLDR)/tests $(LIBFLDR)/ore_algebra.o $(LIBFLDR)/gf_coefficients.o
 
-gf_coefficients.o:
-	$(CC) $(COFLAGS) gf_coefficients.c -o gf_coefficients.o
+impl: ore_algebra gf_coefficients $(SRCFLDR)/impl.c
+	$(CC) $(CPFLAGS) $(SRCFLDR)/impl.c -o $(BLDFLDR)/impl $(LIBFLDR)/ore_algebra.o $(LIBFLDR)/gf_coefficients.o
+
+ore_algebra: $(SRCFLDR)/ore_algebra.c
+	$(CC) $(COPFLAGS) $(SRCFLDR)/ore_algebra.c -o $(LIBFLDR)/ore_algebra.o
+
+gf_coefficients: $(SRCFLDR)/gf_coefficients.c
+	$(CC) $(COFLAGS) $(SRCFLDR)/gf_coefficients.c -o $(LIBFLDR)/gf_coefficients.o
 
 clean:
-	rm -f gf_coefficients.o
-	rm -f ore_algebra.o
-	rm -f impl
-	rm -f tests
+	rm -rf $(LIBFLDR)
+	rm -rf $(BLDFLDR)
