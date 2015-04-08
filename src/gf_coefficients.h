@@ -1,3 +1,6 @@
+#ifndef GF_COEFFICIENTS_H
+#define GF_COEFFICIENTS_H
+
 #define MODULUS (5)
 #define DEGREEEXTENSION (3)
 #define NUMBEROFELEMENTSINGF (125)
@@ -40,3 +43,5 @@ struct GFModulus Hom2(struct GFModulus);
 struct GFModulus scalarMultGF(int, struct GFModulus);
 
 struct GFModulus* getAllPossibleGFElements(void);
+
+#endif

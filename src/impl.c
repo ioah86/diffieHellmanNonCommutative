@@ -13,8 +13,8 @@
 #define LDEG 25,25
 #define QDEG 3,2
 #define PDEG 2,3
-#define PPDEG 10
-#define QQDEG 10
+#define PPDEG 30
+#define QQDEG 30
 
 int main()
 {//main

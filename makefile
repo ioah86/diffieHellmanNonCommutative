@@ -3,7 +3,7 @@
 
 
 #Compiler
-CC=gcc
+CC=gcc-mp-4.9
 CFLAGS=-Wall
 CPFLAGS=-Wall -fopenmp
 COPFLAGS=-Wall -fopenmp -c
@@ -13,13 +13,7 @@ BLDFLDR=build
 LIBFLDR=lib
 TSTSFLDR=tests
 
-all: buildfolder libfolder impl tests
-
-buildfolder:
-	mkdir -p $(BLDFLDR)
-
-libfolder:
-	mkdir -p $(LIBFLDR)
+all: impl tests
 
 tests: ore_algebra gf_coefficients $(TSTSFLDR)/ore_algebra_test.c
 	$(CC) $(CPFLAGS) $(TSTSFLDR)/ore_algebra_test.c -o $(BLDFLDR)/tests $(LIBFLDR)/ore_algebra.o $(LIBFLDR)/gf_coefficients.o
@@ -34,5 +28,7 @@ gf_coefficients: $(SRCFLDR)/gf_coefficients.c
 	$(CC) $(COFLAGS) $(SRCFLDR)/gf_coefficients.c -o $(LIBFLDR)/gf_coefficients.o
 
 clean:
-	rm -rf $(LIBFLDR)
-	rm -rf $(BLDFLDR)
+	rm -f $(LIBFLDR)/ore_algebra.o
+	rm -f $(LIBFLDR)/gf_coefficients.o
+	rm -f $(BLDFLDR)/tests
+	rm -f $(BLDFLDR)/impl

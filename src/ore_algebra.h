@@ -4,7 +4,12 @@
   (c) Reinhold Burger and Albert Heinle
  */
 
+#ifndef ORE_ALGEBRA_H
+#define ORE_ALGEBRA_H
+
 #include "gf_coefficients.h"
+
+#define MIN_TOTAL_DEG_FOR_PARALLEL (200)
 
 struct OrePoly
 {//OrePoly
@@ -49,3 +54,4 @@ struct OrePoly * getRandomOrePoly(int, int, struct GFModulus(*ptrD1manip)(struct
 struct OrePoly * generateRandomSecretKey(int, struct OrePoly*);
 
 
+#endif
