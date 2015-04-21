@@ -1,9 +1,14 @@
+/*
+	WARNING: THIS IS AUTOMATICALLY GENERATED CODE.
+	PLEASE DO NOT CHANGE ANYTHING INSIDE THIS FILE UNLESS YOU KNOW
+	WHAT YOU ARE DOING!
+*/
 #ifndef GF_COEFFICIENTS_H
 #define GF_COEFFICIENTS_H
 
-#define MODULUS (5)
-#define DEGREEEXTENSION (3)
-#define NUMBEROFELEMENTSINGF (125)
+#define MODULUS (%i)
+#define DEGREEEXTENSION (%i)
+#define NUMBEROFELEMENTSINGF (%i)
 
 struct GFModulus
 {//GFModulus
@@ -34,11 +39,7 @@ struct GFModulus getRandomGFElem(void);
 
 struct GFModulus identityMap(struct GFModulus);
 
-struct GFModulus Hom1(struct GFModulus);
-#define ORDERHOM1 (3)
-struct GFModulus Hom2(struct GFModulus);
-#define ORDERHOM2 (3)
-
+%s
 
 struct GFModulus scalarMultGF(int, struct GFModulus);
 

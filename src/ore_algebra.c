@@ -16,7 +16,7 @@
 char* OrePolyToString(struct OrePoly* inp)
 {//OrePolyToString
   int i; int j;//iteration variables
-  int coeffInStringSize = DEGREEEXTENSION*(MODULUS/10+1) + 13;
+  int coeffInStringSize = DEGREEEXTENSION*(MODULUS/10+7+DEGREEEXTENSION/10);
   int monomialInStringSize = (inp->degD1)/10+(inp->degD2)/10 + 8;
   char* coeffInString; // encoding of the coefficient as
 				     // string

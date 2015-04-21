@@ -884,7 +884,7 @@ int test_GF_Enumeration()
     free(tempOutp);
     testSuccess = 0;
   }
-  if (obj[38].coeffs[0] != 1 || obj[38].coeffs[1] != 2 || obj[38].coeffs[2] !=3)
+  if (obj[38].coeffs[0] != 3 || obj[38].coeffs[1] != 2 || obj[38].coeffs[2] !=1)
   {
     tempOutp = GFModulusToString(obj[38]);
     printf("Test 3 failed. Expected the element 1 + 2a +... at the 38-position, but got: %s\n", tempOutp);
