@@ -229,10 +229,7 @@ scalar multiplication.\n");
 scalarMult.\n");
       exit(1);
     }
-    struct GFModulus zeroElem;
-    zeroElem.coeffs[0]= 0;
-    zeroElem.coeffs[1]= 0;
-    zeroElem.coeffs[2]= 0;//TODO make it dependend on DEGREEEXTENSION
+    struct GFModulus zeroElem = getZeroElemGF();
     coeffs[0] = zeroElem;
     result->coeffs = coeffs;
     result->ptrD1manip = inp->ptrD1manip;
