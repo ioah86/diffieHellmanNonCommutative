@@ -1,0 +1,48 @@
+/*
+	WARNING: THIS IS AUTOMATICALLY GENERATED CODE.
+	PLEASE DO NOT CHANGE ANYTHING INSIDE THIS FILE UNLESS YOU KNOW
+	WHAT YOU ARE DOING!
+*/
+#ifndef GF_COEFFICIENTS_H
+#define GF_COEFFICIENTS_H
+
+#define MODULUS (%i)
+#define DEGREEEXTENSION (%i)
+#define NUMBEROFELEMENTSINGF (%i)
+
+struct GFModulus
+{//GFModulus
+  int coeffs[DEGREEEXTENSION];
+};//GFModulus
+
+char* GFModulusToString(struct GFModulus);
+
+void GFModulusToStdOut(struct GFModulus);
+
+struct GFModulus addGF(struct GFModulus,struct GFModulus);
+
+struct GFModulus minusGF(struct GFModulus, struct GFModulus);
+
+struct GFModulus multGF(struct GFModulus, struct GFModulus);
+
+int isZero_GF(struct GFModulus);
+
+int isEqual_GF(struct GFModulus, struct GFModulus);
+
+struct GFModulus getZeroElemGF(void);
+
+struct GFModulus getIdentityElemGF(void);
+
+struct GFModulus getMinusOneElemGF(void);
+
+struct GFModulus getRandomGFElem(void);
+
+struct GFModulus identityMap(struct GFModulus);
+
+%s
+
+struct GFModulus scalarMultGF(int, struct GFModulus);
+
+struct GFModulus* getAllPossibleGFElements(void);
+
+#endif

@@ -12,14 +12,23 @@ Polynomials" by Reinhold Burger and Albert Heinle
 simply use the command
 
 ```
-gcc impl.c
+make
 ```
 
-If you want to do some operations with the underlying ore_algebra, use
-the functions as provided in
+After successful compilation, there will be two new executables in
+the folder: `impl` and `tests`. You can run `tests` in order to see if
+your compiled version of the code executes the tests correctly. If
+this is the case, you know that your version (or your alteration of
+the code) passes selected tests. By running `impl`, a simulation of
+the protocol between two parties *A* and *B* is run. 
+
+You can use the `ore_algebra` library we created for your own
+projects. Simply call
+
 ```
-ore_algebra.c
+make ore_algebra.o
 ```
-for your own project.
+to create a `C`-library, and link it to your project. The header file
+`ore_algebra.h` is included in the source files.
 
 We are looking forward to feedback from users.
