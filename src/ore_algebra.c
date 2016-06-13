@@ -182,26 +182,32 @@ int isEqual_OrePoly(struct OrePoly *inp1, struct OrePoly *inp2)
   return 1;
 }//isEqual_OrePoly
 
-struct OrePoly *getIdentityElemOrePoly()
+struct OrePoly *getIdentityElemOrePoly(struct GFModulus
+				       (*ptrD1manip)(struct GFModulus),
+				       struct GFModulus
+				       (*ptrD2manip)(struct GFModulus))
 {//getIdentityElemOrePoly
   struct OrePoly *result = malloc(sizeof(struct OrePoly));
   result->degD1 = 0;
   result->degD2 = 0;
-  result->ptrD1manip = &Hom1;
-  result->ptrD2manip = &Hom2;
+  result->ptrD1manip = ptrD1manip;
+  result->ptrD2manip = ptrD2manip;
   struct GFModulus *coeffs = malloc(sizeof(struct GFModulus));
   coeffs[0] = getIdentityElemGF();
   result->coeffs = coeffs;
   return result;
 }//getIdentityElemOrePoly
 
-struct OrePoly *getZeroElemOrePoly()
+struct OrePoly *getZeroElemOrePoly(struct GFModulus
+				   (*ptrD1manip)(struct GFModulus),
+				   struct GFModulus
+				   (*ptrD2manip)(struct GFModulus))
 {//getZeroElemOrePoly
   struct OrePoly *result = malloc(sizeof(struct OrePoly));
   result->degD1 = 0;
   result->degD2 = 0;
-  result->ptrD1manip = &Hom1;
-  result->ptrD2manip = &Hom2;
+  result->ptrD1manip = ptrD1manip;
+  result->ptrD2manip = ptrD2manip;
   struct GFModulus *coeffs = malloc(sizeof(struct GFModulus));
   coeffs[0] = getZeroElemGF();
   result->coeffs = coeffs;

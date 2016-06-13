@@ -41,9 +41,15 @@ int isZero_OrePoly(struct OrePoly*);
 
 int isEqual_OrePoly(struct OrePoly*, struct OrePoly*);
 
-struct OrePoly *getIdentityElemOrePoly(void);
+struct OrePoly *getIdentityElemOrePoly(struct GFModulus
+				   (*ptrD1manip)(struct GFModulus),
+				   struct GFModulus
+				   (*ptrD2manip)(struct GFModulus));
 
-struct OrePoly *getZeroElemOrePoly(void);
+struct OrePoly *getZeroElemOrePoly(struct GFModulus
+				   (*ptrD1manip)(struct GFModulus),
+				   struct GFModulus
+				   (*ptrD2manip)(struct GFModulus));
 
 struct OrePoly* scalarMult(int, struct OrePoly*);
 

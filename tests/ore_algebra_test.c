@@ -342,8 +342,8 @@ int test_OrePoly_Arith()
 {//test_OrePoly_Arith
   int testSuccess = 1;
   char *tempOutp;
-  struct OrePoly *z = getZeroElemOrePoly();
-  struct OrePoly *one = getIdentityElemOrePoly();
+  struct OrePoly *z = getZeroElemOrePoly(&Hom1,&Hom2);
+  struct OrePoly *one = getIdentityElemOrePoly(&Hom1,&Hom2);
   //In what follows, we will generate some random elements for
   //testing purposes
   //f1 =(a^2+a+3)*d1^2+(4*a^2+4)*d1*d2+(a^2+4*a)*d2^2+(3*a^2+4*a+4)*d1+(a^2+3)*d2
