@@ -10,11 +10,11 @@
 #include <string.h>
 #include "ore_algebra.h"
 
-#define LDEG 5,5
+#define LDEG 25,25
 #define QDEG 3,2
 #define PDEG 2,3
-#define PPDEG 2
-#define QQDEG 2
+#define PPDEG 50
+#define QQDEG 50
 
 int main()
 {//main
